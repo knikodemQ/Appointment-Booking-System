@@ -1,0 +1,18 @@
+<div class="container">
+    <h2>Definiowanie nieobecności lekarza</h2>
+    <form [formGroup]="absenceForm" (ngSubmit)="onSubmit()">
+      <div>
+        <label for="startDate">Data rozpoczęcia nieobecności:</label>
+        <input type="date" id="startDate" formControlName="startDate" [min]="minDate" required>
+      </div>
+      <div>
+        <label for="endDate">Data zakończenia nieobecności:</label>
+        <input type="date" id="endDate" formControlName="endDate" [min]="absenceForm.get('startDate')?.value || minDate" required>
+      </div>
+      <div>
+        <label for="reason">Powód nieobecności:</label>
+        <input type="text" id="reason" formControlName="reason" required>
+      </div>
+      <button type="submit">Zapisz nieobecność</button>
+    </form>
+  </div>

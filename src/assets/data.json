@@ -1,0 +1,339 @@
+{
+  "users": [
+    {
+      "userId": 1,
+      "firstName": "Anna",
+      "lastName": "Kowalska",
+      "email": "anna.kowalska@example.com",
+      "isDoctor": false,
+      "gender": "female",
+      "age": 30
+    },
+    {
+      "userId": 2,
+      "firstName": "Jan",
+      "lastName": "Nowak",
+      "email": "jan.nowak@example.com",
+      "isDoctor": false,
+      "gender": "male",
+      "age": 45
+    },
+    {
+      "userId": 3,
+      "firstName": "Ewa",
+      "lastName": "Wiśniewska",
+      "email": "ewa.wisniewska@example.com",
+      "isDoctor": true,
+      "gender": "female",
+      "specialization": "Family Doctor"
+    },
+    {
+      "userId": 4,
+      "firstName": "Tomasz",
+      "lastName": "Zieliński",
+      "email": "tomasz.zielinski@example.com",
+      "isDoctor": false,
+      "gender": "male",
+      "age": 29
+    }
+  ],
+  "appointments": [
+    {
+      "appointmentId": 1,
+      "doctorId": 3,
+      "patientId": 1,
+      "type": "wizyta kontrolna",
+      "date": "2025-01-11",
+      "time": "13:00",
+      "duration": 30,
+      "occurred": false,
+      "cancelled": false,
+      "details": "boli"
+    },
+    {
+      "appointmentId": 2,
+      "doctorId": 3,
+      "patientId": 1,
+      "type": "recepta",
+      "date": "2025-01-11",
+      "time": "14:00",
+      "duration": 30,
+      "occurred": false,
+      "cancelled": false,
+      "details": "abcdef"
+    },
+    {
+      "appointmentId": 3,
+      "doctorId": 3,
+      "patientId": 1,
+      "type": "pierwsza wizyta",
+      "date": "2025-01-18",
+      "time": "12:00",
+      "duration": 30,
+      "occurred": false,
+      "cancelled": false,
+      "details": "boli głowa"
+    },
+    {
+      "appointmentId": 4,
+      "doctorId": 3,
+      "patientId": 1,
+      "type": "wizyta kontrolna",
+      "date": "2025-01-18",
+      "time": "12:30",
+      "duration": 30,
+      "occurred": false,
+      "cancelled": false,
+      "details": "boli bardziej"
+    },
+    {
+      "appointmentId": 5,
+      "doctorId": 3,
+      "patientId": 1,
+      "type": "choroba przewlekła",
+      "date": "2025-01-25",
+      "time": "11:30",
+      "duration": 30,
+      "occurred": false,
+      "cancelled": false,
+      "details": "ccc"
+    },
+    {
+      "appointmentId": 6,
+      "doctorId": 3,
+      "patientId": 1,
+      "type": "wizyta kontrolna",
+      "date": "2025-02-20",
+      "time": "15:00",
+      "duration": 30,
+      "occurred": false,
+      "cancelled": false,
+      "details": "www"
+    },
+    {
+      "appointmentId": 7,
+      "doctorId": 3,
+      "patientId": 1,
+      "type": "pierwsza wizyta",
+      "date": "2025-01-23",
+      "time": "18:00",
+      "duration": 30,
+      "occurred": false,
+      "cancelled": false,
+      "details": "pierwzsa konsultacja"
+    },
+    {
+      "appointmentId": 8,
+      "doctorId": 3,
+      "patientId": 1,
+      "type": "recepta",
+      "date": "2025-01-16",
+      "time": "16:00",
+      "duration": 30,
+      "occurred": false,
+      "cancelled": false,
+      "details": "recepta"
+    },
+    {
+      "appointmentId": 9,
+      "doctorId": 3,
+      "patientId": 1,
+      "type": "pierwsza wizyta",
+      "date": "2025-01-16",
+      "time": "18:30",
+      "duration": 30,
+      "occurred": false,
+      "cancelled": false,
+      "details": "123"
+    },
+    {
+      "appointmentId": 10,
+      "doctorId": 3,
+      "patientId": 1,
+      "type": "wizyta kontrolna",
+      "date": "2025-01-16",
+      "time": "20:30",
+      "duration": 30,
+      "occurred": false,
+      "cancelled": false,
+      "details": "ededed"
+    },
+    {
+      "appointmentId": 11,
+      "doctorId": 3,
+      "patientId": 1,
+      "type": "wizyta kontrolna",
+      "date": "2025-01-16",
+      "time": "19:30",
+      "duration": 30,
+      "occurred": false,
+      "cancelled": false,
+      "details": "sssss"
+    },
+    {
+      "appointmentId": 12,
+      "doctorId": 3,
+      "patientId": 1,
+      "type": "wizyta kontrolna",
+      "date": "2025-01-16",
+      "time": "20:00",
+      "duration": 30,
+      "occurred": false,
+      "cancelled": false,
+      "details": "wsws"
+    },
+    {
+      "id": "2077",
+      "appointmentId": 13,
+      "doctorId": 3,
+      "patientId": 1,
+      "type": "pierwsza wizyta",
+      "date": "2025-01-23",
+      "time": "17:30",
+      "duration": 30,
+      "occurred": false,
+      "cancelled": false,
+      "details": "sswswws"
+    },
+    {
+      "appointmentId": 14,
+      "doctorId": 3,
+      "patientId": 1,
+      "type": "pierwsza wizyta",
+      "date": "2025-01-23",
+      "time": "08:30",
+      "duration": 30,
+      "occurred": false,
+      "cancelled": false,
+      "details": "ssww"
+    },
+    {
+      "id": "8ba8",
+      "appointmentId": 15,
+      "doctorId": 3,
+      "patientId": 1,
+      "type": "wizyta kontrolna",
+      "date": "2025-01-23",
+      "time": "08:00",
+      "duration": 30,
+      "occurred": false,
+      "cancelled": false,
+      "details": "eeff"
+    },
+    {
+      "id": "d100",
+      "appointmentId": 16,
+      "doctorId": 3,
+      "patientId": 1,
+      "type": "pierwsza wizyta",
+      "date": "2025-01-23",
+      "time": "11:00",
+      "duration": 30,
+      "occurred": false,
+      "cancelled": false,
+      "details": "dwdwdwd"
+    }
+  ],
+  "availability": [
+    {
+      "availabilityId": 1,
+      "doctorId": 3,
+      "type": "cykliczne",
+      "startDate": "2025-01-11",
+      "endDate": "2025-01-29",
+      "days": [
+        "poniedziałek",
+        "wtorek",
+        "czwartek",
+        "sobota"
+      ],
+      "timeSlots": [
+        {
+          "from": "08:00",
+          "to": "14:30"
+        },
+        {
+          "from": "16:00",
+          "to": "21:00"
+        }
+      ]
+    },
+    {
+      "availabilityId": 2,
+      "type": "jednorazowe",
+      "startDate": "2025-02-20",
+      "timeSlots": [
+        {
+          "from": "14:00",
+          "to": "16:30"
+        }
+      ],
+      "endDate": "2025-02-21",
+      "days": [],
+      "doctorId": 3
+    }
+  ],
+  "absences": [
+    {
+      "absenceId": 1,
+      "doctorId": 3,
+      "startDate": "2025-02-15",
+      "endDate": "2025-02-16",
+      "reason": "Wakacje"
+    },
+    {
+      "absenceId": 2,
+      "doctorId": 3,
+      "startDate": "2025-01-27",
+      "endDate": "2025-01-28",
+      "reason": "chill"
+    },
+    {
+      "absenceId": 3,
+      "doctorId": 3,
+      "startDate": "2025-01-27",
+      "endDate": "2025-01-28",
+      "reason": "chill"
+    },
+    {
+      "absenceId": 4,
+      "doctorId": 3,
+      "startDate": "2025-01-27",
+      "endDate": "2025-01-29",
+      "reason": "chillx2"
+    },
+    {
+      "absenceId": 5,
+      "doctorId": 3,
+      "startDate": "2025-01-17",
+      "endDate": "2025-01-19",
+      "reason": "chillx2"
+    }
+  ],
+  "cart": [
+    {
+      "cartId": 1,
+      "patientId": 1,
+      "appointmentId": 1,
+      "status": "awaiting payment"
+    }
+  ],
+  "appointmentTypes": [
+    {
+      "appointmentTypeId": 1,
+      "type": "pierwsza wizyta"
+    },
+    {
+      "appointmentTypeId": 2,
+      "type": "wizyta kontrolna"
+    },
+    {
+      "appointmentTypeId": 3,
+      "type": "choroba przewlekła"
+    },
+    {
+      "appointmentTypeId": 4,
+      "type": "recepta"
+    }
+  ]
+}

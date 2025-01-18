@@ -1,0 +1,16 @@
+<div class="basket">
+    <h2>Twój Koszyk</h2>
+    <ul>
+      <li *ngFor="let appointment of appointments; let i = index">
+        <p><strong>Typ:</strong> {{ appointment.type }}</p>
+        <p><strong>Data:</strong> {{ appointment.date }}</p>
+        <p><strong>Godzina:</strong> {{ appointment.time }}</p>
+        <p><strong>Szczegóły:</strong> {{ appointment.details }}</p>
+        <button class="remove-button" (click)="removeAppointment(i)">X</button>
+      </li>
+    </ul>
+    <div *ngIf="appointments.length === 0">
+      <p>Twój koszyk jest pusty.</p>
+    </div>
+    <button *ngIf="appointments.length > 0" (click)="simulatePayment()">Zapłać</button>
+  </div>

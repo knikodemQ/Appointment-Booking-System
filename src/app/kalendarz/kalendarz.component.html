@@ -1,0 +1,78 @@
+<div class="calendar" [class.is-day-view]="isDayView">
+  <div class="header">
+    <div class="left-container">
+      <button class="week-button" (click)="changeViewMode()">
+        {{ isDayView ? 'Weekly View' : 'Daily View' }}
+      </button>
+    </div>
+    <div class="pagination-container">
+      <div class="pagination" *ngIf="!isDayView">
+        <button *ngFor="let range of timeRanges; let i = index"
+                [class.active]="i === currentRangeIndex"
+                (click)="setTimeRange(i)">
+          {{ range.label }}
+        </button>
+      </div>
+    </div>
+    <div class="right-container">
+      <button *ngIf="!isDayView" class="week-button" (click)="changeWeek(-1)">‹ Previous Week</button>
+      <button *ngIf="isDayView" class="week-button" (click)="changeDay(-1)">‹ Previous Day</button>
+      <span *ngIf="!isDayView" class="week-span">{{ currentWeek | date: 'dd.MM.yyyy' }} - {{ endOfWeek | date: 'dd.MM.yyyy' }}</span>
+      <span *ngIf="isDayView" class="week-span">{{ currentDay | date: 'EEEE, dd.MM.yyyy' }}</span>
+      <button *ngIf="!isDayView" class="week-button" (click)="changeWeek(1)">Next Week ›</button>
+      <button *ngIf="isDayView" class="week-button" (click)="changeDay(1)">Next Day ›</button>
+    </div>
+  </div>
+
+  <table class="table table-bordered">
+    <thead class="table-dark">
+      <tr>
+        <th class="time-header"></th>
+        <th *ngFor="let day of weekDays" [class.today]="isToday(day.date)" class="day-header">
+          <div>{{ day.date | date: 'EEEE, dd.MM' }}</div>
+          <div>{{ day.consultations }} visits</div>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let timeSlot of visibleTimeSlots" [class.current-time]="isCurrentTimeSlot(timeSlot)">
+        <td class="time-label">{{ timeSlot.time }}</td>
+        <td *ngFor="let slot of timeSlot.slots; let i = index"
+            [class.past]="slot.past"
+            [class.current]="slot.current"
+            [class.today]="isToday(weekDays[i].date)"
+            [class.booked]="slot.booked"
+            [class.available]="slot.available"
+            [class.absent]="slot.absent"
+            [ngClass]="{
+              'pierwsza-wizyta': slot.consultationType === 'pierwsza wizyta',
+              'wizyta-kontrolna': slot.consultationType === 'wizyta kontrolna',
+              'choroba-przewlekla': slot.consultationType === 'choroba przewlekła',
+              'recepta': slot.consultationType === 'recepta',
+              'cancelled': slot.appointment?.cancelled
+            }"
+            (click)="!slot.booked && slot.available && selectSlot(weekDays[i].date, timeSlot.time)"
+            (mouseenter)="onHover(slot.appointment)"
+            (mouseleave)="onHover(undefined)">
+          <div class="slot-content">
+            {{ slot.consultationType || '' }}
+            <button *ngIf="slot.booked" class="remove-button" (click)="removeAppointment(slot.appointment?.appointmentId)">X</button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="hoveredAppointment" class="appointment-details visible">
+    <h3>Appointment Details</h3>
+    <p><strong>First Name:</strong> {{ getPatientFirstName(hoveredAppointment.patientId) }}</p>
+    <p><strong>Last Name:</strong> {{ getPatientLastName(hoveredAppointment.patientId) }}</p>
+    <p><strong>Gender:</strong> {{ getPatientGender(hoveredAppointment.patientId) }}</p>
+    <p><strong>Age:</strong> {{ getPatientAge(hoveredAppointment.patientId) }}</p>
+    <p><strong>Appointment Type:</strong> {{ hoveredAppointment.type }}</p>
+    <p><strong>Date:</strong> {{ hoveredAppointment.date }}</p>
+    <p><strong>Time:</strong> {{ hoveredAppointment.time }}</p>
+    <p><strong>Details:</strong> {{ hoveredAppointment.details }}</p>
+    <p><strong>Status:</strong> {{ hoveredAppointment.cancelled ? 'Cancelled' : 'Scheduled' }}</p>
+  </div>
+</div>

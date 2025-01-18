@@ -1,0 +1,270 @@
+.calendar {
+  max-width: 1400px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.left-container {
+  flex: 1;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.pagination-container {
+  flex: 2;
+  display: flex;
+  justify-content: center;
+}
+
+.right-container {
+  flex: 3;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.week-button, .week-span {
+  padding: 0.5rem 1rem;
+  border: 2px solid #000000;
+  border-radius: 5px;
+  background-color: #ffffff;
+  color: #000000;
+  font-size: 1rem;
+  margin: 0 0.5rem;
+}
+
+.week-button {
+  cursor: pointer;
+}
+
+.week-button:hover {
+  background-color: #aaaaaa;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table td.time-label {
+  width: 60px;
+  background-color: #f8f9fa;
+  font-weight: bold;
+  vertical-align: top;
+  font-size: 0.8rem; 
+  padding-top: 0.5rem; 
+}
+
+.table th, .table td {
+  border: 1px solid #ccc;
+  text-align: center;
+  padding: 1rem; 
+}
+
+.table th.time-header {
+  width: 60px;
+}
+
+.table th.day-header {
+  font-size: 0.8rem; 
+  line-height: 1rem; 
+  padding: 0.5rem; 
+}
+
+.table-dark{
+  max-height: 30px;
+}
+
+.table td.available {
+  background-color: #07dc39;
+  border-color: #c3e6cb;
+  cursor: pointer;
+}
+
+.table td.booked {
+  background-color: #f99;
+}
+
+.table td.past {
+  background-color: #ddd; /* Gray background for past slots */
+}
+
+.table td.past.pierwsza-wizyta {
+  background-color: #f0e68c; /* Light gray for past slots */
+}
+
+.table td.past.wizyta-kontrolna {
+  background-color: #f4a460; 
+}
+
+.table td.past.choroba-przewlekla {
+  background-color: #e76cc0; 
+}
+
+.table td.past.recepta {
+  background-color: #e480de; 
+}
+
+.table td.current {
+  background-color: #cce5ff;
+}
+
+@media (max-width: 768px) {
+  .calendar {
+    width: 100%;
+  }
+  .calendar.is-day-view .table {
+    width: 100%;
+    margin: 0 auto;
+  }
+  .calendar.is-day-view .table td {
+    padding: 1rem;
+  }
+}
+
+.slot-content {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pagination button {
+  margin: 0 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 2px solid #000000;
+  border-radius: 5px;
+  background-color: #ffffff;
+  color: rgb(0, 0, 0);
+  cursor: pointer;
+}
+
+.pagination button.active {
+  background-color: #aaaaaa;
+}
+
+.pagination button:hover {
+  background-color: #aaaaaa;
+}
+
+.remove-button {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background-color: rgb(5, 5, 5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  line-height: 20px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.slot-content {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.remove-button:hover {
+  background-color: darkred;
+}
+
+
+.table td.today, .table th.today {
+  border-left: 2px solid red;
+  border-right: 2px solid red;
+}
+
+.current-time {
+  position: relative;
+}
+
+.current-time::after {
+  content: '';
+  position: absolute;
+  top: 15%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: red;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+.calendar.is-day-view .table {
+  width: 100%;
+  margin: 0 auto; 
+}
+
+.calendar.is-day-view .table td {
+  padding: 2rem; 
+  min-height: 110px; 
+}
+
+.appointment-details {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 1rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  display: none;
+}
+
+.appointment-details.visible {
+  display: block;
+}
+
+.table td.current-slot {
+  border: 2px solid black;
+}
+
+.table td.pierwsza-wizyta {
+  background-color: yellow;
+}
+
+.table td.wizyta-kontrolna {
+  background-color: orange;
+}
+
+.table td.choroba-przewlekla {
+  background-color: rgb(255, 0, 230);
+}
+
+.table td.recepta {
+  background-color: rgb(135, 7, 161);
+}
+
+.table td.available:hover {
+  background-color: lightblue;
+  cursor: pointer;
+}
+
+.table td.absent {
+  background-color: #850404;
+  color: red;
+  text-decoration: line-through;
+  background-color: #ffcccc;
+}
+
+.table td.cancelled .slot-content {
+  text-decoration: line-through;
+  color: red;
+  background-color: #ffcccc;
+}

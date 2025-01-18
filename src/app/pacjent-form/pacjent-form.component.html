@@ -1,0 +1,51 @@
+<div class="reservation-form">
+  <h3>Rezerwacja Konsultacji</h3>
+  <form [formGroup]="appointmentForm" (ngSubmit)="onSubmit()">
+    <div>
+      <label for="firstName">Imię:</label>
+      <input type="text" id="firstName" formControlName="firstName" required readonly>
+    </div>
+    <div>
+      <label for="lastName">Nazwisko:</label>
+      <input type="text" id="lastName" formControlName="lastName" required readonly>
+    </div>
+    <div>
+      <label for="gender">Płeć:</label>
+      <select id="gender" formControlName="gender" required readonly>
+        <option value="male">Mężczyzna</option>
+        <option value="female">Kobieta</option>
+      </select>
+    </div>
+    <div>
+      <label for="age">Wiek:</label>
+      <input type="number" id="age" formControlName="age" required readonly>
+    </div>
+    <div>
+      <label for="info">Informacje dla lekarza:</label>
+      <textarea id="info" formControlName="details" required></textarea>
+    </div>
+    <div>
+      <label for="appointmentType">Typ konsultacji:</label>
+      <select id="appointmentType" formControlName="type" required>
+        <option value="pierwsza wizyta">Pierwsza wizyta</option>
+        <option value="wizyta kontrolna">Wizyta kontrolna</option>
+        <option value="choroba przewlekła">Choroba przewlekła</option>
+        <option value="recepta">Recepta</option>
+      </select>
+    </div>
+    <div>
+      <label for="appointmentDate">Data:</label>
+      <input type="date" id="appointmentDate" formControlName="date" required [min]="minDate">
+    </div>
+    <div>
+      <label for="appointmentTime">Czas:</label>
+      <select id="appointmentTime" formControlName="time" required>
+        <option *ngFor="let slot of availableSlots" [value]="slot">{{ slot }}</option>
+      </select>
+      <div *ngIf="availableSlots.length === 0" class="no-slots-message">
+        Brak wizyt
+      </div>
+    </div>
+    <button type="submit" [disabled]="availableSlots.length === 0">Zarezerwuj</button>
+  </form>
+</div>

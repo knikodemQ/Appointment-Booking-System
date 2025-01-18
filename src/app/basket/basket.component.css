@@ -1,0 +1,34 @@
+.basket {
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  max-width: 600px;
+  margin: 0 auto;
+  }
+  
+  .basket h2 {
+    margin-top: 0;
+  }
+  
+  .basket ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .basket li {
+    margin: 0.5rem 0;
+  }
+  
+  .basket button {
+    padding: 0.5rem 1rem;
+    border: 2px solid #000000;
+    border-radius: 5px;
+    background-color: #ffffff;
+    color: #000000;
+    cursor: pointer;
+  }
+  
+  .basket button:hover {
+    background-color: #aaaaaa;
+  }
