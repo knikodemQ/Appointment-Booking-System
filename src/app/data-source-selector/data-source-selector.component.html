@@ -1,0 +1,668 @@
+<div class="data-source-selector">
+  <div class="selector-header">
+    <h2>Zarządzanie Danymi</h2>
+    <button class="register-doctor-btn" (click)="onRegisterDoctor()">
+      Rejestracja Lekarza
+    </button>
+  </div>
+  
+  <div class="source-tabs">
+    <button class="source-tab" 
+            [class.selected]="dataSource === 'json-server'" 
+            (click)="selectDataSource('json-server')">
+      JSON Server
+    </button>
+    <button class="source-tab" 
+            [class.selected]="dataSource === 'firebase'" 
+            (click)="selectDataSource('firebase')">
+      Firebase
+    </button>
+    <button class="source-tab" 
+            [class.selected]="dataSource === 'mongodb'" 
+            (click)="selectDataSource('mongodb')">
+      MongoDB
+    </button>
+  </div>
+</div>
+
+
+<div *ngIf="dataSource === 'firebase'" class="data-section">
+  <!-- Appointments Section -->
+  <div class="data-section">
+    <div class="section-header">
+      <h3 class="section-title">Wizyty</h3>
+      <div class="section-actions">
+        <button class="action-btn" (click)="toggleAddForm('appointments')">
+          Dodaj Wizytę
+        </button>
+      </div>
+    </div>
+
+    <table class="data-table" *ngIf="(appointments$ | async) as appointments; else appointmentsEmpty"
+           [style.display]="appointments.length > 0 ? 'table' : 'none'">
+      <thead>
+        <tr>
+          <th>ID Lekarza</th>
+          <th>ID Pacjenta</th>
+          <th>Typ</th>
+          <th>Data</th>
+          <th>Czas</th>
+          <th>Czas trwania</th>
+          <th>Status</th>
+          <th>Akcje</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let appointment of appointments$ | async">
+          <td>{{ appointment.doctorId }}</td>
+          <td>{{ appointment.patientId }}</td>
+          <td>{{ appointment.type }}</td>
+          <td>{{ appointment.date }}</td>
+          <td>{{ appointment.time }}</td>
+          <td>{{ appointment.duration }}</td>
+          <td>
+            <span *ngIf="appointment.cancelled">Anulowana</span>
+            <span *ngIf="!appointment.cancelled && appointment.occurred">Odbyła się</span>
+            <span *ngIf="!appointment.cancelled && !appointment.occurred">Zaplanowana</span>
+          </td>
+          <td>
+            <div class="table-actions">
+              <button class="btn-edit" (click)="editAppointment(appointment)">Edytuj</button>
+              <button class="btn-delete" 
+                      *ngIf="appointment.uid !== undefined" 
+                      (click)="deleteFirebaseItem('appointments', appointment.uid)">
+                Usuń
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #appointmentsEmpty>
+      <div class="empty-state">
+        <p>Brak wizyt w bazie danych</p>
+      </div>
+    </ng-template>
+
+    <div class="add-form" *ngIf="showAddForm['appointments']">
+      <form (ngSubmit)="addAppointment()">
+        <div class="form-grid">
+          <input [(ngModel)]="newAppointment.doctorId" name="doctorId" 
+                 placeholder="ID Lekarza" class="form-input" required>
+          <input [(ngModel)]="newAppointment.patientId" name="patientId" 
+                 placeholder="ID Pacjenta" class="form-input" required>
+          <input [(ngModel)]="newAppointment.type" name="type" 
+                 placeholder="Typ wizyty" class="form-input" required>
+          <input [(ngModel)]="newAppointment.date" name="date" type="date"
+                 placeholder="Data" class="form-input" required>
+          <input [(ngModel)]="newAppointment.time" name="time" type="time"
+                 placeholder="Czas" class="form-input" required>
+          <input [(ngModel)]="newAppointment.duration" name="duration" type="number"
+                 placeholder="Czas trwania (min)" class="form-input" required>
+          <input [(ngModel)]="newAppointment.details" name="details" 
+                 placeholder="Szczegóły" class="form-input">
+        </div>
+        <button type="submit" class="form-submit">
+          {{ newAppointment.uid ? 'Aktualizuj' : 'Dodaj' }} Wizytę
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Users Section -->
+  <div class="data-section">
+    <div class="section-header">
+      <h3 class="section-title">Użytkownicy</h3>
+      <div class="section-actions">
+        <button class="action-btn" (click)="toggleAddForm('users')">
+          Dodaj Użytkownika
+        </button>
+      </div>
+    </div>
+
+    <table class="data-table" *ngIf="(users$ | async) as users; else usersEmpty"
+           [style.display]="users.length > 0 ? 'table' : 'none'">
+      <thead>
+        <tr>
+          <th>Imię</th>
+          <th>Nazwisko</th>
+          <th>Email</th>
+          <th>Typ</th>
+          <th>Płeć</th>
+          <th>Wiek</th>
+          <th>Specjalizacja</th>
+          <th>Akcje</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users$ | async">
+          <td>{{ user.firstName }}</td>
+          <td>{{ user.lastName }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.isDoctor ? 'Lekarz' : 'Pacjent' }}</td>
+          <td>{{ user.gender }}</td>
+          <td>{{ user.age }}</td>
+          <td>{{ user.specialization || '-' }}</td>
+          <td>
+            <div class="table-actions">
+              <button class="btn-edit" (click)="editUser(user)">Edytuj</button>
+              <button class="btn-delete" 
+                      *ngIf="user.uid !== undefined" 
+                      (click)="deleteFirebaseItem('users', user.uid)">
+                Usuń
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #usersEmpty>
+      <div class="empty-state">
+        <p>Brak użytkowników w bazie danych</p>
+      </div>
+    </ng-template>
+
+    <div class="add-form" *ngIf="showAddForm['users']">
+      <form (ngSubmit)="addUser()">
+        <div class="form-grid">
+          <input [(ngModel)]="newUser.firstName" name="firstName" 
+                 placeholder="Imię" class="form-input" required>
+          <input [(ngModel)]="newUser.lastName" name="lastName" 
+                 placeholder="Nazwisko" class="form-input" required>
+          <input [(ngModel)]="newUser.email" name="email" type="email"
+                 placeholder="Email" class="form-input" required>
+          <select [(ngModel)]="newUser.isDoctor" name="isDoctor" class="form-input" required>
+            <option value="">Wybierz typ</option>
+            <option [value]="true">Lekarz</option>
+            <option [value]="false">Pacjent</option>
+          </select>
+          <select [(ngModel)]="newUser.gender" name="gender" class="form-input" required>
+            <option value="">Wybierz płeć</option>
+            <option value="M">Mężczyzna</option>
+            <option value="K">Kobieta</option>
+          </select>
+          <input [(ngModel)]="newUser.age" name="age" type="number"
+                 placeholder="Wiek" class="form-input" required>
+          <input [(ngModel)]="newUser.specialization" name="specialization" 
+                 placeholder="Specjalizacja (dla lekarzy)" class="form-input">
+          <select [(ngModel)]="newUser.admin" name="admin" class="form-input" required>
+            <option value="">Administrator?</option>
+            <option [value]="true">Tak</option>
+            <option [value]="false">Nie</option>
+          </select>
+        </div>
+        <button type="submit" class="form-submit">
+          {{ newUser.uid ? 'Aktualizuj' : 'Dodaj' }} Użytkownika
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Availability Section -->
+  <div class="data-section">
+    <div class="section-header">
+      <h3 class="section-title">Dostępność</h3>
+      <div class="section-actions">
+        <button class="action-btn" (click)="toggleAddForm('availability')">
+          Dodaj Dostępność
+        </button>
+      </div>
+    </div>
+
+    <table class="data-table" *ngIf="(availabilities$ | async) as availabilities; else availabilityEmpty"
+           [style.display]="availabilities.length > 0 ? 'table' : 'none'">
+      <thead>
+        <tr>
+          <th>ID Lekarza</th>
+          <th>Typ</th>
+          <th>Data od</th>
+          <th>Data do</th>
+          <th>Dni</th>
+          <th>Sloty czasowe</th>
+          <th>Akcje</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let availability of availabilities$ | async">
+          <td>{{ availability.doctorId }}</td>
+          <td>{{ availability.type }}</td>
+          <td>{{ availability.startDate }}</td>
+          <td>{{ availability.endDate }}</td>
+          <td>{{ availability.days }}</td>
+          <td>{{ availability.timeSlots }}</td>
+          <td>
+            <div class="table-actions">
+              <button class="btn-edit" (click)="editAvailability(availability)">Edytuj</button>
+              <button class="btn-delete" 
+                      *ngIf="availability.uid !== undefined" 
+                      (click)="deleteFirebaseItem('availability', availability.uid)">
+                Usuń
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #availabilityEmpty>
+      <div class="empty-state">
+        <p>Brak dostępności w bazie danych</p>
+      </div>
+    </ng-template>
+
+    <div class="add-form" *ngIf="showAddForm['availability']">
+      <form (ngSubmit)="addAvailability()">
+        <div class="form-grid">
+          <input [(ngModel)]="newAvailability.doctorId" name="doctorId" 
+                 placeholder="ID Lekarza" class="form-input" required>
+          <input [(ngModel)]="newAvailability.type" name="type" 
+                 placeholder="Typ dostępności" class="form-input" required>
+          <input [(ngModel)]="newAvailability.startDate" name="startDate" type="date"
+                 placeholder="Data rozpoczęcia" class="form-input" required>
+          <input [(ngModel)]="newAvailability.endDate" name="endDate" type="date"
+                 placeholder="Data zakończenia" class="form-input" required>
+          <input [(ngModel)]="newAvailability.days" name="days" 
+                 placeholder="Dni (np. Mo,Tu,We)" class="form-input" required>
+          <input [(ngModel)]="newAvailability.timeSlots" name="timeSlots" 
+                 placeholder="Sloty czasowe" class="form-input" required>
+        </div>
+        <button type="submit" class="form-submit">
+          {{ newAvailability.uid ? 'Aktualizuj' : 'Dodaj' }} Dostępność
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Absences Section -->
+  <div class="data-section">
+    <div class="section-header">
+      <h3 class="section-title">Nieobecności</h3>
+      <div class="section-actions">
+        <button class="action-btn" (click)="toggleAddForm('absences')">
+          Dodaj Nieobecność
+        </button>
+      </div>
+    </div>
+
+    <table class="data-table" *ngIf="(absences$ | async) as absences; else absencesEmpty"
+           [style.display]="absences.length > 0 ? 'table' : 'none'">
+      <thead>
+        <tr>
+          <th>ID Lekarza</th>
+          <th>Data od</th>
+          <th>Data do</th>
+          <th>Powód</th>
+          <th>Akcje</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let absence of absences$ | async">
+          <td>{{ absence.doctorId }}</td>
+          <td>{{ absence.startDate }}</td>
+          <td>{{ absence.endDate }}</td>
+          <td>{{ absence.reason }}</td>
+          <td>
+            <div class="table-actions">
+              <button class="btn-edit" (click)="editAbsence(absence)">Edytuj</button>
+              <button class="btn-delete" 
+                      *ngIf="absence.uid !== undefined" 
+                      (click)="deleteFirebaseItem('absences', absence.uid)">
+                Usuń
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #absencesEmpty>
+      <div class="empty-state">
+        <p>Brak nieobecności w bazie danych</p>
+      </div>
+    </ng-template>
+
+    <div class="add-form" *ngIf="showAddForm['absences']">
+      <form (ngSubmit)="addAbsence()">
+        <div class="form-grid">
+          <input [(ngModel)]="newAbsence.doctorId" name="doctorId" 
+                 placeholder="ID Lekarza" class="form-input" required>
+          <input [(ngModel)]="newAbsence.startDate" name="startDate" type="date"
+                 placeholder="Data rozpoczęcia" class="form-input" required>
+          <input [(ngModel)]="newAbsence.endDate" name="endDate" type="date"
+                 placeholder="Data zakończenia" class="form-input" required>
+          <input [(ngModel)]="newAbsence.reason" name="reason" 
+                 placeholder="Powód nieobecności" class="form-input" required>
+        </div>
+        <button type="submit" class="form-submit">
+          {{ newAbsence.uid ? 'Aktualizuj' : 'Dodaj' }} Nieobecność
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MongoDB Section -->
+<div *ngIf="dataSource === 'mongodb'" class="data-section">
+  <div class="mongodb-status">
+    <button (click)="testMongoConnection()" class="action-btn">Test MongoDB Connection</button>
+    <span [ngClass]="mongoStatus" *ngIf="mongoStatus">{{ mongoMessage }}</span>
+    <p><strong>API Base:</strong> http://localhost:3001/api/</p>
+  </div>
+
+  <!-- Appointments Section -->
+  <div class="data-section">
+    <div class="section-header">
+      <h3 class="section-title">Wizyty</h3>
+      <div class="section-actions">
+        <button class="action-btn" (click)="toggleAddForm('appointments')">
+          Dodaj Wizytę
+        </button>
+      </div>
+    </div>
+
+    <table class="data-table" *ngIf="(appointments$ | async) as appointments; else appointmentsEmpty"
+           [style.display]="appointments.length > 0 ? 'table' : 'none'">
+      <thead>
+        <tr>
+          <th>ID Lekarza</th>
+          <th>ID Pacjenta</th>
+          <th>Typ</th>
+          <th>Data</th>
+          <th>Czas</th>
+          <th>Czas trwania</th>
+          <th>Status</th>
+          <th>Akcje</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let appointment of appointments$ | async">
+          <td>{{ appointment.doctorId }}</td>
+          <td>{{ appointment.patientId }}</td>
+          <td>{{ appointment.type }}</td>
+          <td>{{ appointment.date }}</td>
+          <td>{{ appointment.time }}</td>
+          <td>{{ appointment.duration }}</td>
+          <td>
+            <span *ngIf="appointment.cancelled">Anulowana</span>
+            <span *ngIf="!appointment.cancelled && appointment.occurred">Odbyła się</span>
+            <span *ngIf="!appointment.cancelled && !appointment.occurred">Zaplanowana</span>
+          </td>
+          <td>
+            <div class="table-actions">
+              <button class="btn-edit" (click)="editAppointment(appointment)">Edytuj</button>
+              <button class="btn-delete" 
+                      *ngIf="appointment._id" 
+                      (click)="deleteMongoItem('appointments', appointment._id!)">
+                Usuń
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #appointmentsEmpty>
+      <div class="empty-state">
+        <p>Brak wizyt w bazie danych</p>
+      </div>
+    </ng-template>
+
+    <div class="add-form" *ngIf="showAddForm['appointments']">
+      <form (ngSubmit)="addAppointment()">
+        <div class="form-grid">
+          <input [(ngModel)]="newAppointment.doctorId" name="doctorId" 
+                 placeholder="ID Lekarza" class="form-input" required>
+          <input [(ngModel)]="newAppointment.patientId" name="patientId" 
+                 placeholder="ID Pacjenta" class="form-input" required>
+          <input [(ngModel)]="newAppointment.type" name="type" 
+                 placeholder="Typ wizyty" class="form-input" required>
+          <input [(ngModel)]="newAppointment.date" name="date" type="date"
+                 placeholder="Data" class="form-input" required>
+          <input [(ngModel)]="newAppointment.time" name="time" type="time"
+                 placeholder="Czas" class="form-input" required>
+          <input [(ngModel)]="newAppointment.duration" name="duration" type="number"
+                 placeholder="Czas trwania (min)" class="form-input" required>
+          <input [(ngModel)]="newAppointment.details" name="details" 
+                 placeholder="Szczegóły" class="form-input">
+        </div>
+        <button type="submit" class="form-submit">
+          {{ newAppointment._id ? 'Aktualizuj' : 'Dodaj' }} Wizytę
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Users Section -->
+  <div class="data-section">
+    <div class="section-header">
+      <h3 class="section-title">Użytkownicy</h3>
+      <div class="section-actions">
+        <button class="action-btn" (click)="toggleAddForm('users')">
+          Dodaj Użytkownika
+        </button>
+      </div>
+    </div>
+
+    <table class="data-table" *ngIf="(users$ | async) as users; else usersEmpty"
+           [style.display]="users.length > 0 ? 'table' : 'none'">
+      <thead>
+        <tr>
+          <th>Imię</th>
+          <th>Nazwisko</th>
+          <th>Email</th>
+          <th>Typ</th>
+          <th>Płeć</th>
+          <th>Wiek</th>
+          <th>Specjalizacja</th>
+          <th>Akcje</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users$ | async">
+          <td>{{ user.firstName }}</td>
+          <td>{{ user.lastName }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.isDoctor ? 'Lekarz' : 'Pacjent' }}</td>
+          <td>{{ user.gender }}</td>
+          <td>{{ user.age }}</td>
+          <td>{{ user.specialization || '-' }}</td>
+          <td>
+            <div class="table-actions">
+              <button class="btn-edit" (click)="editUser(user)">Edytuj</button>
+              <button class="btn-delete" 
+                      *ngIf="user._id" 
+                      (click)="deleteMongoItem('users', user._id!)">
+                Usuń
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #usersEmpty>
+      <div class="empty-state">
+        <p>Brak użytkowników w bazie danych</p>
+      </div>
+    </ng-template>
+
+    <div class="add-form" *ngIf="showAddForm['users']">
+      <form (ngSubmit)="addUser()">
+        <div class="form-grid">
+          <input [(ngModel)]="newUser.firstName" name="firstName" 
+                 placeholder="Imię" class="form-input" required>
+          <input [(ngModel)]="newUser.lastName" name="lastName" 
+                 placeholder="Nazwisko" class="form-input" required>
+          <input [(ngModel)]="newUser.email" name="email" type="email"
+                 placeholder="Email" class="form-input" required>
+          <select [(ngModel)]="newUser.isDoctor" name="isDoctor" class="form-input" required>
+            <option value="">Wybierz typ</option>
+            <option [value]="true">Lekarz</option>
+            <option [value]="false">Pacjent</option>
+          </select>
+          <select [(ngModel)]="newUser.gender" name="gender" class="form-input" required>
+            <option value="">Wybierz płeć</option>
+            <option value="M">Mężczyzna</option>
+            <option value="K">Kobieta</option>
+          </select>
+          <input [(ngModel)]="newUser.age" name="age" type="number"
+                 placeholder="Wiek" class="form-input" required>
+          <input [(ngModel)]="newUser.specialization" name="specialization" 
+                 placeholder="Specjalizacja (dla lekarzy)" class="form-input">
+          <select [(ngModel)]="newUser.admin" name="admin" class="form-input" required>
+            <option value="">Administrator?</option>
+            <option [value]="true">Tak</option>
+            <option [value]="false">Nie</option>
+          </select>
+        </div>
+        <button type="submit" class="form-submit">
+          {{ newUser._id ? 'Aktualizuj' : 'Dodaj' }} Użytkownika
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Availability Section -->
+  <div class="data-section">
+    <div class="section-header">
+      <h3 class="section-title">Dostępność</h3>
+      <div class="section-actions">
+        <button class="action-btn" (click)="toggleAddForm('availability')">
+          Dodaj Dostępność
+        </button>
+      </div>
+    </div>
+
+    <table class="data-table" *ngIf="(availabilities$ | async) as availabilities; else availabilityEmpty"
+           [style.display]="availabilities.length > 0 ? 'table' : 'none'">
+      <thead>
+        <tr>
+          <th>ID Lekarza</th>
+          <th>Typ</th>
+          <th>Data od</th>
+          <th>Data do</th>
+          <th>Dni</th>
+          <th>Sloty czasowe</th>
+          <th>Akcje</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let availability of availabilities$ | async">
+          <td>{{ availability.doctorId }}</td>
+          <td>{{ availability.type }}</td>
+          <td>{{ availability.startDate }}</td>
+          <td>{{ availability.endDate }}</td>
+          <td>{{ availability.days }}</td>
+          <td>{{ availability.timeSlots }}</td>
+          <td>
+            <div class="table-actions">
+              <button class="btn-edit" (click)="editAvailability(availability)">Edytuj</button>
+              <button class="btn-delete" 
+                      *ngIf="availability._id" 
+                      (click)="deleteMongoItem('availability', availability._id!)">
+                Usuń
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #availabilityEmpty>
+      <div class="empty-state">
+        <p>Brak dostępności w bazie danych</p>
+      </div>
+    </ng-template>
+
+    <div class="add-form" *ngIf="showAddForm['availability']">
+      <form (ngSubmit)="addAvailability()">
+        <div class="form-grid">
+          <input [(ngModel)]="newAvailability.doctorId" name="doctorId" 
+                 placeholder="ID Lekarza" class="form-input" required>
+          <input [(ngModel)]="newAvailability.type" name="type" 
+                 placeholder="Typ dostępności" class="form-input" required>
+          <input [(ngModel)]="newAvailability.startDate" name="startDate" type="date"
+                 placeholder="Data rozpoczęcia" class="form-input" required>
+          <input [(ngModel)]="newAvailability.endDate" name="endDate" type="date"
+                 placeholder="Data zakończenia" class="form-input" required>
+          <input [(ngModel)]="newAvailability.days" name="days" 
+                 placeholder="Dni (np. Mo,Tu,We)" class="form-input" required>
+          <input [(ngModel)]="newAvailability.timeSlots" name="timeSlots" 
+                 placeholder="Sloty czasowe" class="form-input" required>
+        </div>
+        <button type="submit" class="form-submit">
+          {{ newAvailability._id ? 'Aktualizuj' : 'Dodaj' }} Dostępność
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Absences Section -->
+  <div class="data-section">
+    <div class="section-header">
+      <h3 class="section-title">Nieobecności</h3>
+      <div class="section-actions">
+        <button class="action-btn" (click)="toggleAddForm('absences')">
+          Dodaj Nieobecność
+        </button>
+      </div>
+    </div>
+
+    <table class="data-table" *ngIf="(absences$ | async) as absences; else absencesEmpty"
+           [style.display]="absences.length > 0 ? 'table' : 'none'">
+      <thead>
+        <tr>
+          <th>ID Lekarza</th>
+          <th>Data od</th>
+          <th>Data do</th>
+          <th>Powód</th>
+          <th>Akcje</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let absence of absences$ | async">
+          <td>{{ absence.doctorId }}</td>
+          <td>{{ absence.startDate }}</td>
+          <td>{{ absence.endDate }}</td>
+          <td>{{ absence.reason }}</td>
+          <td>
+            <div class="table-actions">
+              <button class="btn-edit" (click)="editAbsence(absence)">Edytuj</button>
+              <button class="btn-delete" 
+                      *ngIf="absence._id" 
+                      (click)="deleteMongoItem('absences', absence._id!)">
+                Usuń
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #absencesEmpty>
+      <div class="empty-state">
+        <p>Brak nieobecności w bazie danych</p>
+      </div>
+    </ng-template>
+
+    <div class="add-form" *ngIf="showAddForm['absences']">
+      <form (ngSubmit)="addAbsence()">
+        <div class="form-grid">
+          <input [(ngModel)]="newAbsence.doctorId" name="doctorId" 
+                 placeholder="ID Lekarza" class="form-input" required>
+          <input [(ngModel)]="newAbsence.startDate" name="startDate" type="date"
+                 placeholder="Data rozpoczęcia" class="form-input" required>
+          <input [(ngModel)]="newAbsence.endDate" name="endDate" type="date"
+                 placeholder="Data zakończenia" class="form-input" required>
+          <input [(ngModel)]="newAbsence.reason" name="reason" 
+                 placeholder="Powód nieobecności" class="form-input" required>
+        </div>
+        <button type="submit" class="form-submit">
+          {{ newAbsence._id ? 'Aktualizuj' : 'Dodaj' }} Nieobecność
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,7 +1,11 @@
 .calendar {
   max-width: 1400px;
   margin: 0 auto;
-  font-family: Arial, sans-serif;
+  font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
 .header {
@@ -9,6 +13,9 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
 }
 
 .left-container {
@@ -32,142 +39,276 @@
 
 .week-button, .week-span {
   padding: 0.5rem 1rem;
-  border: 2px solid #000000;
-  border-radius: 5px;
-  background-color: #ffffff;
-  color: #000000;
-  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 500;
   margin: 0 0.5rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
 }
 
 .week-button {
   cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .week-button:hover {
-  background-color: #aaaaaa;
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 2px;
+  background-color: #e2e8f0;
+  border: 2px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 4px;
 }
 
 .table td.time-label {
-  width: 60px;
-  background-color: #f8f9fa;
-  font-weight: bold;
-  vertical-align: top;
-  font-size: 0.8rem; 
-  padding-top: 0.5rem; 
+  width: 70px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  font-weight: 600;
+  vertical-align: middle;
+  font-size: 0.65rem;
+  color: #475569;
+  padding: 0.25rem 0.125rem;
+  border: 2px solid #cbd5e1;
+  border-radius: 4px;
+  text-align: center;
+  height: 28px;
 }
 
 .table th, .table td {
-  border: 1px solid #ccc;
+  border: 1px solid #cbd5e1;
   text-align: center;
-  padding: 1rem; 
+  padding: 0.25rem;
+  background-color: #ffffff;
+  border-radius: 4px;
+  position: relative;
+  transition: all 0.2s ease;
+  min-height: 28px;
+  height: 28px;
+}
+
+.table td:not(.time-label):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 2;
+  border-color: #3b82f6;
 }
 
 .table th.time-header {
-  width: 60px;
+  width: 70px;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  font-weight: 600;
+  color: #475569;
+  border: 2px solid #cbd5e1;
+  height: 40px;
 }
 
 .table th.day-header {
-  font-size: 0.8rem; 
-  line-height: 1rem; 
-  padding: 0.5rem; 
+  font-size: 0.8rem;
+  line-height: 1rem;
+  padding: 0.5rem 0.25rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  font-weight: 600;
+  color: #1e293b;
+  border: 2px solid #cbd5e1;
+  height: 32px;
 }
 
 .table-dark{
   max-height: 30px;
 }
 
+/* Available slots - Google-style green */
 .table td.available {
-  background-color: #07dc39;
-  border-color: #c3e6cb;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: white;
   cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(34, 197, 94, 0.2);
 }
 
+.table td.available:hover {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(34, 197, 94, 0.3);
+}
+
+/* Booked appointments - modern red */
 .table td.booked {
-  background-color: #f99;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
 }
 
+/* Past slots - subtle gray */
 .table td.past {
-  background-color: #ddd; /* Gray background for past slots */
+  background-color: #f8fafc;
+  color: #94a3b8;
+  opacity: 0.6;
 }
 
+/* Past appointment types with subtle colors */
 .table td.past.pierwsza-wizyta {
-  background-color: #f0e68c; /* Light gray for past slots */
+  background: linear-gradient(135deg, #fef3c7 0%, #fde047 50%);
+  color: #92400e;
+  opacity: 0.7;
 }
 
 .table td.past.wizyta-kontrolna {
-  background-color: #f4a460; 
+  background: linear-gradient(135deg, #fed7aa 0%, #fb923c 50%);
+  color: #c2410c;
+  opacity: 0.7;
 }
 
 .table td.past.choroba-przewlekla {
-  background-color: #e76cc0; 
+  background: linear-gradient(135deg, #fce7f3 0%, #f472b6 50%);
+  color: #be185d;
+  opacity: 0.7;
 }
 
 .table td.past.recepta {
-  background-color: #e480de; 
+  background: linear-gradient(135deg, #ede9fe 0%, #c084fc 50%);
+  color: #7c3aed;
+  opacity: 0.7;
 }
 
+/* Current time indicator */
 .table td.current {
-  background-color: #cce5ff;
+  background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%);
+  border: 2px solid #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
+/* Responsive Design */
 @media (max-width: 768px) {
   .calendar {
     width: 100%;
+    margin: 0.5rem;
+    border-radius: 8px;
   }
+  
+  .header {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  
   .calendar.is-day-view .table {
     width: 100%;
     margin: 0 auto;
   }
+  
+  .calendar.is-day-view .table {
+    width: 95%;
+    border: 2px solid #cbd5e1;
+  }
+  
   .calendar.is-day-view .table td {
     padding: 1rem;
+    min-height: 60px;
+  }
+  
+  .table th.day-header {
+    font-size: 0.75rem;
+    padding: 0.5rem 0.125rem;
+    height: 35px;
+  }
+  
+  .table th, .table td {
+    height: 30px;
+    padding: 0.25rem;
+  }
+  
+  .slot-content {
+    font-size: 0.65rem;
+    min-height: 25px;
+  }
+  
+  .week-button, .week-span {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    margin: 0 0.25rem;
   }
 }
 
 .slot-content {
   height: 100%;
+  min-height: 26px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 500;
+  line-height: 1;
+  padding: 0.1rem;
+  border-radius: 3px;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .pagination button {
-  margin: 0 0.5rem;
-  padding: 0.5rem 1rem;
-  border: 2px solid #000000;
-  border-radius: 5px;
-  background-color: #ffffff;
-  color: rgb(0, 0, 0);
+  margin: 0 0.25rem;
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.25);
+  color: white;
   cursor: pointer;
+  font-weight: 500;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
 }
 
 .pagination button.active {
-  background-color: #aaaaaa;
+  background: rgba(255, 255, 255, 0.4);
+  color: white;
+  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.6);
 }
 
 .pagination button:hover {
-  background-color: #aaaaaa;
+  background: rgba(255, 255, 255, 0.35);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.15);
+}
+
+.pagination button.active:hover {
+  background: rgba(255, 255, 255, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.8);
 }
 
 .remove-button {
   position: absolute;
-  top: 2px;
-  right: 2px;
-  background-color: rgb(5, 5, 5);
+  top: -4px;
+  right: -4px;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   color: white;
-  border: none;
+  border: 2px solid white;
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   font-size: 12px;
   line-height: 20px;
   text-align: center;
   cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+  z-index: 10;
 }
 
 .slot-content {
@@ -179,13 +320,22 @@
 }
 
 .remove-button:hover {
-  background-color: darkred;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.4);
 }
 
 
 .table td.today, .table th.today {
-  border-left: 2px solid red;
-  border-right: 2px solid red;
+  border: 3px solid #3b82f6 !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+  position: relative;
+}
+
+.table th.today {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
+  color: #1e40af;
+  font-weight: 700;
 }
 
 .current-time {
@@ -195,60 +345,197 @@
 .current-time::after {
   content: '';
   position: absolute;
-  top: 15%;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background-color: red;
+  top: 50%;
+  left: -2px;
+  right: -2px;
+  height: 3px;
+  background: linear-gradient(90deg, #ef4444 0%, #f97316 50%, #eab308 100%);
   transform: translateY(-50%);
-  z-index: 1;
+  z-index: 5;
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
 
 .calendar.is-day-view .table {
-  width: 100%;
-  margin: 0 auto; 
+  width: 90%;
+  max-width: 800px;
+  margin: 0 auto;
+  border: 3px solid #cbd5e1;
+  border-radius: 12px;
+  background-color: #f8fafc;
 }
 
 .calendar.is-day-view .table td {
-  padding: 2rem; 
-  min-height: 110px; 
+  padding: 1.25rem;
+  min-height: 80px;
+  height: auto;
+  border: 1.5px solid #e2e8f0;
 }
 
+.calendar.is-day-view .table th {
+  padding: 1rem;
+  border: 2px solid #cbd5e1;
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  font-weight: 700;
+}
+
+.calendar.is-day-view .slot-content {
+  font-size: 0.9rem;
+  min-height: 50px;
+  padding: 0.5rem;
+}
+
+/* 🏥 Modern Appointment Details Modal */
 .appointment-details {
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: #fff;
-  border: 1px solid #ccc;
-  padding: 1rem;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  z-index: 10;
+  transform: translate(-50%, -50%) scale(0.9);
+  background: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
   display: none;
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  max-width: 380px;
+  width: 85%;
 }
 
 .appointment-details.visible {
   display: block;
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.appointment-details::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+  border-radius: 20px 20px 0 0;
+}
+
+.appointment-details h3 {
+  margin: 0 0 1rem 0;
+  color: #1e293b;
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.appointment-details p {
+  margin: 0.5rem 0;
+  padding: 0.5rem 0.75rem;
+  background: #f8fafc;
+  border-radius: 6px;
+  border-left: 3px solid #3b82f6;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.appointment-details strong {
+  color: #1e293b;
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+
+.appointment-details-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.appointment-details button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.close-details {
+  background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+  color: white;
+}
+
+.close-details:hover {
+  background: linear-gradient(135deg, #475569 0%, #334155 100%);
+  transform: translateY(-1px);
+}
+
+.edit-appointment {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+}
+
+.edit-appointment:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  transform: translateY(-1px);
+}
+
+/* Modal backdrop */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.modal-backdrop.visible {
+  opacity: 1;
 }
 
 .table td.current-slot {
   border: 2px solid black;
 }
 
+/* Modern appointment types with Google-style colors */
 .table td.pierwsza-wizyta {
-  background-color: yellow;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(251, 191, 36, 0.3);
 }
 
 .table td.wizyta-kontrolna {
-  background-color: orange;
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(249, 115, 22, 0.3);
 }
 
 .table td.choroba-przewlekla {
-  background-color: rgb(255, 0, 230);
+  background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(236, 72, 153, 0.3);
 }
 
 .table td.recepta {
-  background-color: rgb(135, 7, 161);
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(139, 92, 246, 0.3);
 }
 
 .table td.available:hover {
@@ -256,15 +543,53 @@
   cursor: pointer;
 }
 
+/* Modern absence style */
 .table td.absent {
-  background-color: #850404;
-  color: red;
-  text-decoration: line-through;
-  background-color: #ffcccc;
+  background: repeating-linear-gradient(
+    45deg,
+    #fca5a5,
+    #fca5a5 4px,
+    #ffffff 4px,
+    #ffffff 8px
+  );
+  color: #dc2626;
+  font-weight: 600;
+  position: relative;
+  border: 2px solid #ef4444;
 }
 
+.table td.absent::after {
+  content: '🚫';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.2rem;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modern cancelled appointment style */
 .table td.cancelled .slot-content {
-  text-decoration: line-through;
-  color: red;
-  background-color: #ffcccc;
+  position: relative;
+  color: #dc2626;
+  background: linear-gradient(135deg, #fee2e2 0%, #fca5a5 100%);
+  border-radius: 4px;
+  padding: 0.25rem;
+}
+
+.table td.cancelled .slot-content::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #dc2626;
+  transform: translateY(-50%);
 }

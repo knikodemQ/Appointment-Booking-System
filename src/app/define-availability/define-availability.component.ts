@@ -1,9 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AbstractControl, ValidationErrors } from '@angular/forms';
+import { AbsenceService } from '../services/absence.service';
+import { AvailabilityService } from '../services/availability.service';
+
+import { User } from '../models/user.model';
+import { Absence } from '../models/absence.model';
+import { Availability } from '../models/availability.model';
+import { Appointment } from './../models/appointment.model';
 
 @Component({
   selector: 'app-define-availability',
@@ -18,7 +24,12 @@ export class DefineAvailabilityComponent implements OnInit {
   absences: any[] = [];
   errorMessage: string = '';
 
-  constructor(private fb: FormBuilder, private http: HttpClient, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private absenceService: AbsenceService,
+    private availabilityService: AvailabilityService
+  ) {
     this.availabilityForm = this.fb.group({
       type: ['cykliczne'],
       startDate: ['', Validators.required],
@@ -45,7 +56,7 @@ export class DefineAvailabilityComponent implements OnInit {
   }
 
   loadAbsences(): void {
-    this.http.get<any[]>('http://localhost:3000/absences').subscribe(data => {
+    this.absenceService.getAbsences().subscribe(data => {
       this.absences = data;
     });
   }
@@ -94,10 +105,10 @@ export class DefineAvailabilityComponent implements OnInit {
 
   validateTimeSlots(index: number): void {
     const timeSlot = this.timeSlotControls.at(index) as FormGroup;
-    const from = timeSlot.get('from')?.value;
-    const to = timeSlot.get('to')?.value;
+    const from = this.parseTime(timeSlot.get('from')?.value);
+    const to = this.parseTime(timeSlot.get('to')?.value);
   
-    if (from && to && from >= to) {
+    if (from !== null && to !== null && from >= to) {
       timeSlot.get('to')?.setErrors({ invalidTime: true });
     } else {
       timeSlot.get('to')?.setErrors(null);
@@ -106,14 +117,14 @@ export class DefineAvailabilityComponent implements OnInit {
     for (let i = 0; i < this.timeSlotControls.length; i++) {
       if (i !== index) {
         const otherTimeSlot = this.timeSlotControls.at(i) as FormGroup;
-        const otherFrom = otherTimeSlot.get('from')?.value;
-        const otherTo = otherTimeSlot.get('to')?.value;
+        const otherFrom = this.parseTime(otherTimeSlot.get('from')?.value);
+        const otherTo = this.parseTime(otherTimeSlot.get('to')?.value);
   
         if (
-          from &&
-          to &&
-          otherFrom &&
-          otherTo &&
+          from !== null &&
+          to !== null &&
+          otherFrom !== null &&
+          otherTo !== null &&
           (from < otherTo && to > otherFrom)
         ) {
           timeSlot.get('from')?.setErrors({ overlap: true });
@@ -124,6 +135,13 @@ export class DefineAvailabilityComponent implements OnInit {
       }
     }
   }
+  
+  parseTime(time: string): number | null {
+    if (!time) return null;
+    const [hours, minutes] = time.split(':').map(Number);
+    return hours * 60 + minutes; // Zamiana na minuty
+  }
+  
 
   validateDates(): void {
     const startDate = this.availabilityForm.get('startDate')?.value;
@@ -185,7 +203,7 @@ export class DefineAvailabilityComponent implements OnInit {
   getDaysBetween(start: Date, end: Date): number[] {
     const days = [];
     const current = new Date(start);
-    while (current < end) {
+    while (current <= end) {
       days.push(current.getDay());
       current.setDate(current.getDate() + 1);
     }
@@ -205,7 +223,7 @@ export class DefineAvailabilityComponent implements OnInit {
 
     availability.doctorId = 3; // doctorId 3 simplify
 
-    this.http.post('http://localhost:3000/availability', availability).subscribe({
+    this.availabilityService.createAvailability(availability).subscribe({
       next: () => {
         this.router.navigate(['/calendar']);
       },

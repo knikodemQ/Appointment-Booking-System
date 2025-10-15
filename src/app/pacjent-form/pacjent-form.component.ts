@@ -1,48 +1,15 @@
 import { Component, OnInit } from '@angular/core';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { BasketService } from '../services/basket.service';
-
-interface Appointment {
-  appointmentId: number;
-  doctorId: number;
-  patientId: number;
-  type: string;
-  date: string;
-  time: string;
-  duration: number;
-  occurred: boolean;
-  cancelled: boolean;
-  details: string;
-}
-
-interface User {
-  userId: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  isDoctor: boolean;
-  gender: string;
-  age: number;
-}
-
-interface Availability {
-  doctorId: number;
-  type: string;
-  startDate: string;
-  endDate: string;
-  days: string[];
-  timeSlots: { from: string; to: string }[];
-}
-
-interface Absence {
-  doctorId: number;
-  startDate: string;
-  endDate: string;
-  reason: string;
-}
+import { PacjentFormService } from '../services/pacjent-form.service';
+import { User } from '../models/user.model';
+import { Absence } from '../models/absence.model';
+import { Availability } from '../models/availability.model';
+import { Appointment } from './../models/appointment.model';
+import { switchMap, first } from 'rxjs/operators';
+import { combineLatest } from 'rxjs';
 
 @Component({
   selector: 'app-pacjent-form',
@@ -53,133 +20,150 @@ interface Absence {
 })
 export class PacjentFormComponent implements OnInit {
   appointmentForm: FormGroup;
-  user: User = {
-    userId: 1,
-    firstName: '',
-    lastName: '',
-    email: '',
-    isDoctor: false,
-    gender: '',
-    age: 0
-  };
+  user: User | null = null;
 
   availableSlots: string[] = [];
   availabilities: Availability[] = [];
   absences: Absence[] = [];
   errorMessage: string = '';
   minDate: string = new Date().toISOString().split('T')[0];
+  isSubmitting: boolean = false;
 
   constructor(
     private fb: FormBuilder,
-    private http: HttpClient,
     private router: Router,
     private route: ActivatedRoute,
-    private basketService: BasketService
+    private basketService: BasketService,
+    private pacjentFormService: PacjentFormService
   ) {
     this.appointmentForm = this.fb.group({
       firstName: [{ value: '', disabled: true }],
       lastName: [{ value: '', disabled: true }],
       gender: [{ value: '', disabled: true }],
       age: [{ value: '', disabled: true }],
-      details: [''],
-      type: [''],
-      date: [''],
-      time: ['']
+      details: ['', Validators.required],
+      type: ['', Validators.required],
+      date: ['', Validators.required],
+      time: ['', Validators.required]
     });
   }
 
   ngOnInit() {
-    this.route.queryParams.subscribe(params => {
-      this.appointmentForm.patchValue({ date: params['date'] });
-      this.loadUserData();
-      this.loadAvailabilities();
-      this.loadAbsences();
-    });
-  
-    this.appointmentForm.get('date')?.valueChanges.subscribe(date => {
-      this.loadAvailableSlots();
-    });
-  }
-
-  loadAbsences() {
-    this.http.get<Absence[]>('http://localhost:3000/absences').subscribe(data => {
-      this.absences = data;
-      this.loadAvailableSlots();
-    });
-  }
-
-  loadUserData() {
-    this.http.get<User[]>('http://localhost:3000/users').subscribe(data => {
-      const user = data.find(u => u.userId === 1); // patientId is 1 for simplicity
-      if (user) {
+    // Ładowanie parametrów i danych użytkownika
+    this.route.queryParams.pipe(
+      switchMap(params => {
+        this.appointmentForm.patchValue({ date: params['date'], time: params['time'] });
+        return this.pacjentFormService.loadUserData();
+      }),
+      switchMap(user => {
         this.user = user;
-        this.appointmentForm.patchValue({
-          firstName: user.firstName,
-          lastName: user.lastName,
-          gender: user.gender,
-          age: user.age
-        });
+        console.log('User loaded in pacjent-form:', user);
+        if (this.user) {
+          console.log('Patching form with user data:', this.user.firstName, this.user.lastName);
+          this.appointmentForm.patchValue({
+            firstName: this.user.firstName,
+            lastName: this.user.lastName,
+            gender: this.user.gender,
+            age: this.user.age
+          });
+        } else {
+          console.log('No user data loaded!');
+        }
+        return combineLatest([
+          this.pacjentFormService.loadAvailabilities(),
+          this.pacjentFormService.loadAbsences()
+        ]);
+      })
+    ).subscribe({
+      next: ([availabilities, absences]) => {
+        this.availabilities = availabilities;
+        this.absences = absences;
+        this.loadAvailableSlots();
+      },
+      error: (err) => {
+        this.errorMessage = 'Nie udało się załadować danych.';
+        console.error(err);
       }
     });
-  }
 
-  loadAvailabilities() {
-    this.http.get<Availability[]>('http://localhost:3000/availability').subscribe(data => {
-      this.availabilities = data;
+    // Reakcja na zmianę daty
+    this.appointmentForm.get('date')?.valueChanges.subscribe(() => {
       this.loadAvailableSlots();
     });
   }
 
+  /**
+   * Ładuje dostępne sloty na podstawie daty, dostępności i nieobecności.
+   */
   loadAvailableSlots() {
     const date = this.appointmentForm.get('date')?.value;
-    if (!date) return;
-  
-    const now = new Date();
+    if (!date) {
+      this.availableSlots = [];
+      return;
+    }
+
     const selectedDate = new Date(date);
-  
+    const now = new Date();
+
     if (selectedDate < now) {
       this.availableSlots = [];
       return;
     }
-  
-    // Sprawdź, czy wybrany dzień jest dniem odwołanym
+
+    // Sprawdzenie, czy wybrany dzień jest dniem odwołanym
     const isCancelledDay = this.absences.some(absence => {
       const startDate = new Date(absence.startDate);
       const endDate = new Date(absence.endDate);
       return selectedDate >= startDate && selectedDate <= endDate;
     });
-  
+
     if (isCancelledDay) {
       this.availableSlots = [];
       return;
     }
-  
+
     const availabilities = this.availabilities.filter(a => {
       const startDate = new Date(a.startDate);
       const endDate = new Date(a.endDate);
+      const dayName = selectedDate.toLocaleDateString('pl-PL', { weekday: 'long' });
+
       if (a.type === 'cykliczne') {
-        return selectedDate >= startDate && selectedDate <= endDate && a.days.includes(selectedDate.toLocaleDateString('pl-PL', { weekday: 'long' }));
+        return selectedDate >= startDate && selectedDate <= endDate && a.days.includes(dayName);
       } else if (a.type === 'jednorazowe') {
         return selectedDate.toDateString() === startDate.toDateString();
       }
       return false;
     });
-  
+
     if (availabilities.length === 0) {
       this.availableSlots = [];
       return;
     }
-  
-    this.http.get<Appointment[]>('http://localhost:3000/appointments').subscribe(data => {
-      const selectedDateAppointments = data.filter((app: Appointment) => app.date === date);
-      let allSlots: string[] = [];
-      availabilities.forEach(availability => {
-        allSlots = allSlots.concat(this.generateTimeSlots(availability));
-      });
-      this.availableSlots = allSlots.filter(slot => !selectedDateAppointments.some((app: Appointment) => app.time === slot));
+
+    // Pobranie wszystkich istniejących wizyt
+    this.pacjentFormService.getExistingAppointments().subscribe({
+      next: (existingAppointments: Appointment[]) => {
+        let allSlots: string[] = [];
+        availabilities.forEach(availability => {
+          allSlots = allSlots.concat(this.generateTimeSlots(availability));
+        });
+
+        // Filtracja slotów na podstawie wszystkich istniejących wizyt
+        this.availableSlots = allSlots.filter(slot => 
+          !existingAppointments.some(app => app.date === date && app.time === slot)
+        );
+      },
+      error: (err) => {
+        this.errorMessage = 'Nie udało się pobrać istniejących wizyt.';
+        console.error(err);
+      }
     });
   }
 
+  /**
+   * Generuje sloty czasowe na podstawie dostępności.
+   * @param availability Obiekt dostępności
+   */
   generateTimeSlots(availability: Availability): string[] {
     const slots: string[] = [];
     availability.timeSlots.forEach(timeSlot => {
@@ -193,24 +177,57 @@ export class PacjentFormComponent implements OnInit {
     return slots;
   }
 
+  /**
+   * Konwertuje czas w formacie HH:MM na wartość dziesiętną.
+   * @param time Czas w formacie 'HH:MM'
+   */
   convertTimeToDecimal(time: string): number {
     const [hours, minutes] = time.split(':').map(Number);
     return hours + minutes / 60;
   }
 
+  /**
+   * Konwertuje wartość dziesiętną na czas w formacie HH:MM.
+   * @param decimal Wartość dziesiętna
+   */
   convertDecimalToTime(decimal: number): string {
     const hours = Math.floor(decimal);
-    const minutes = (decimal % 1) * 60;
+    const minutes = Math.round((decimal % 1) * 60);
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   }
 
+  /**
+   * Pobiera właściwy identyfikator użytkownika w zależności od źródła danych.
+   */
+  private getUserId(): string | number | undefined {
+    if (!this.user) return undefined;
+    
+    const dataSource = localStorage.getItem('dataSource');
+    if (dataSource === 'firebase') {
+      return this.user.uid;
+    } else if (dataSource === 'mongodb') {
+      return this.user._id;
+    } else {
+      return this.user.id;
+    }
+  }
+
+  /**
+   * Obsługuje wysyłanie formularza.
+   */
   onSubmit() {
-    if (this.appointmentForm.invalid) return;
+    const userId = this.getUserId();
+    console.log('onSubmit called - User:', this.user, 'UserId:', userId, 'Form valid:', this.appointmentForm.valid);
+    if (this.appointmentForm.invalid || this.isSubmitting || !this.user || !userId) {
+      console.log('Submit blocked - Form invalid:', this.appointmentForm.invalid, 'Submitting:', this.isSubmitting, 'User:', !this.user, 'UserId:', !userId);
+      return;
+    }
+
+    this.isSubmitting = true;
 
     const newAppointment: Appointment = {
-      appointmentId: 0,
-      doctorId: 3, // doctorId is 3 for simplicity
-      patientId: 1, // patientId is 1 for simplicity
+      doctorId: 3, // simplification: doctorId is 3
+      patientId: userId, // uniwersalny identyfikator
       type: this.appointmentForm.get('type')?.value,
       date: this.appointmentForm.get('date')?.value,
       time: this.appointmentForm.get('time')?.value,
@@ -220,23 +237,40 @@ export class PacjentFormComponent implements OnInit {
       details: this.appointmentForm.get('details')?.value
     };
 
-    this.http.get<Appointment[]>('http://localhost:3000/appointments').subscribe(existingAppointments => {
-      const newAppointmentId = existingAppointments.length > 0
-        ? Math.max(...existingAppointments.map(a => a.appointmentId)) + 1
-        : 1;
+    this.pacjentFormService.getExistingAppointments().pipe(
+      first()
+    ).subscribe({
+      next: (existingAppointments: Appointment[]) => {
+        // Sprawdzenie, czy wybrany slot jest już zarezerwowany
+        const isSlotTaken = existingAppointments.some(app => app.date === newAppointment.date && app.time === newAppointment.time);
 
-      newAppointment.appointmentId = newAppointmentId;
-
-      this.http.post<Appointment>('http://localhost:3000/appointments', newAppointment).subscribe({
-        next: () => {
-          this.basketService.addToBasket(newAppointment); // Dodaj wizytę do koszyka
-          this.router.navigate(['/calendar']);
-        },
-        error: (err) => {
-          this.errorMessage = 'Nie udało się zapisać spotkania. Spróbuj ponownie.';
-          console.error(err); 
+        if (isSlotTaken) {
+          this.errorMessage = 'Wybrany slot jest już zarezerwowany.';
+          this.isSubmitting = false;
+          return;
         }
-      });
+
+        // Tworzenie nowej wizyty
+        this.pacjentFormService.createAppointment(newAppointment).subscribe({
+          next: (createdAppointment: Appointment) => {
+            // Dodanie wizyty do koszyka
+            this.basketService.addToBasket(createdAppointment);
+            // Navigacja lub informacja o sukcesie
+            this.isSubmitting = false;
+            this.router.navigate(['/calendar']);
+          },
+          error: (err: any) => {
+            this.errorMessage = 'Nie udało się utworzyć wizyty.';
+            console.error(err);
+            this.isSubmitting = false;
+          }
+        });
+      },
+      error: (err: any) => {
+        this.errorMessage = 'Nie udało się pobrać istniejących wizyt.';
+        console.error(err);
+        this.isSubmitting = false;
+      }
     });
   }
 }

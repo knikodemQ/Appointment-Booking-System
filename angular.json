@@ -20,7 +20,7 @@
               "zone.js",
               "@angular/localize/init"
             ],
-            "tsConfig": "tsconfig.app.json",
+            "tsConfig": "config/tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
               "src/assets"
@@ -36,13 +36,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "1.5MB",
+                  "maximumError": "2MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "10kB",
+                  "maximumError": "20kB"
                 }
               ],
               "outputHashing": "all"
@@ -78,7 +78,7 @@
               "zone.js/testing",
               "@angular/localize/init"
             ],
-            "tsConfig": "tsconfig.spec.json",
+            "tsConfig": "config/tsconfig.spec.json",
             "assets": [
               {
                 "glob": "**/*",
@@ -93,5 +93,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }

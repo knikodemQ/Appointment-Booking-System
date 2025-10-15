@@ -1,0 +1,87 @@
+.register-doctor-container {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .register-doctor-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333333;
+  }
+  
+  .register-doctor-container form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .register-doctor-container form div {
+    margin-bottom: 15px;
+  }
+  
+  .register-doctor-container label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555555;
+  }
+  
+  .register-doctor-container input[type="text"],
+  .register-doctor-container input[type="email"],
+  .register-doctor-container input[type="password"],
+  .register-doctor-container input[type="number"],
+  .register-doctor-container select,
+  .register-doctor-container textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+  }
+  
+  .register-doctor-container input[type="text"]:focus,
+  .register-doctor-container input[type="email"]:focus,
+  .register-doctor-container input[type="password"]:focus,
+  .register-doctor-container input[type="number"]:focus,
+  .register-doctor-container select:focus,
+  .register-doctor-container textarea:focus {
+    border-color: #007bff;
+    outline: none;
+  }
+  
+  .register-doctor-container button {
+    padding: 12px;
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .register-doctor-container button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+  
+  .register-doctor-container button:hover:not(:disabled) {
+    background-color: #0056b3;
+  }
+  
+  .error {
+    margin-top: 10px;
+    color: #ff0000;
+    text-align: center;
+    font-weight: bold;
+  }
+  
+  .error-msg {
+    color: #ff0000;
+    font-size: 0.9rem;
+    margin-top: 5px;
+  }

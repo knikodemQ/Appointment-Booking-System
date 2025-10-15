@@ -7,51 +7,18 @@ import { ChangeDetectorRef } from '@angular/core';
 import { forkJoin } from 'rxjs';
 import { BasketService } from '../services/basket.service';
 import { CalendarService } from '../services/calendar.service';
+import { AuthService } from '../services/auth.service'; 
 
+
+
+import { User } from '../models/user.model';
+import { Absence } from '../models/absence.model';
+import { Availability } from '../models/availability.model';
+import { Appointment } from './../models/appointment.model';
 
 interface TimeSlot {
   time: string;
   slots: { past: boolean; current: boolean; consultationType?: string; booked?: boolean; available?: boolean; absent?: boolean; appointment?: Appointment }[];
-}
-
-interface Appointment {
-  appointmentId: number;
-  doctorId: number;
-  patientId: number;
-  type: string;
-  date: string;
-  time: string;
-  duration: number;
-  occurred: boolean;
-  cancelled: boolean;
-  details: string;
-}
-
-interface User {
-  userId: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  isDoctor: boolean;
-  gender: string;
-  age?: number;
-  specialization?: string;
-}
-
-interface Availability {
-  doctorId: number;
-  type: string;
-  startDate: string;
-  endDate: string;
-  days: string[];
-  timeSlots: { from: string; to: string }[];
-}
-
-interface Absence {
-  doctorId: number;
-  startDate: string;
-  endDate: string;
-  reason: string;
 }
 
 @Component({
@@ -77,6 +44,9 @@ export class KalendarzComponent implements OnInit {
   appointmentsSubject = new BehaviorSubject<Appointment[]>([]);
   selectedSlot: { date: Date; time: string } | null = null;
   hoveredAppointment: Appointment | null = null;
+  user: User | null = null;
+  
+  errorMessage: string = '';
 
   timeRanges = [
     { start: 7, end: 12, label: '7:00 - 12:00' },
@@ -84,27 +54,55 @@ export class KalendarzComponent implements OnInit {
     { start: 17, end: 22, label: '17:00 - 22:00' },
   ];
 
-  constructor(private http: HttpClient, private router: Router, private cdr: ChangeDetectorRef, private basketService: BasketService, private calendarService: CalendarService) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+    private basketService: BasketService,
+    private calendarService: CalendarService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
+
+    this.calendarService.loadAllData();
+
+    this.authService.user$.subscribe(user => {
+      this.user = user;
+      this.reloadPageData();
+    });
+
+    this.calendarService.users$.subscribe((users) => {
+      this.users = users;
+    });
+
+    this.calendarService.availabilities$.subscribe((availabilities) => {
+      this.availabilities = availabilities;
+      this.markAvailableSlots();
+      this.updateConsultationsCount();
+    });
+
+    this.calendarService.absences$.subscribe((absences) => {
+      this.absences = absences;
+      this.markAbsences();
+    });
+
     this.calendarService.appointments$.subscribe((appointments) => {
       this.appointments = appointments;
       this.updateVisibleTimeSlots();
       this.markBookedSlots();
     });
+
     this.setCurrentTimeRange();
     this.updateWeek();
-    this.loadUsers();
-    this.loadAvailabilities();
     this.checkMobileView();
-    this.reloadPageData();
+    
 
     if (this.isDayView) {
       this.updateDay();
     } else {
       this.updateWeek();
     }
-    this.loadDataOnInit();
   }
 
   @HostListener('window:resize', [])
@@ -132,36 +130,19 @@ export class KalendarzComponent implements OnInit {
     }
   }
 
-  private loadDataOnInit(): void {
-    this.loadUsers();
-    this.loadAvailabilities();
-    this.calendarService.loadAppointments();
+  private reloadPageData(): void {
+   
+    this.generateTimeSlots();
+    this.calendarService.loadAllData();
     this.updateVisibleTimeSlots();
     this.markAvailableSlots();
     this.markBookedSlots();
     this.markAbsences();
+    this.updateConsultationsCount();
+    
   }
 
-  private reloadPageData(): void {
-    forkJoin({
-      users: this.http.get<{ users: User[] }>('assets/data.json'),
-      availabilities: this.http.get<{ availability: Availability[] }>('assets/data.json'),
-      absences: this.http.get<{ absences: Absence[] }>('assets/data.json'),
-      appointments: this.http.get<{ appointments: Appointment[] }>('assets/data.json')
-    }).subscribe(({ users, availabilities, absences, appointments }) => {
-      this.users = users.users;
-      this.availabilities = availabilities.availability;
-      this.absences = absences.absences;
-      this.appointments = appointments.appointments;
-      this.appointmentsSubject.next(this.appointments);
-      this.generateTimeSlots();
-      this.updateVisibleTimeSlots();
-      this.markAvailableSlots();
-      this.markBookedSlots();
-      this.markAbsences();
-      this.updateConsultationsCount();
-    });
-  }
+  
 
   setCurrentTimeRange() {
     const now = new Date();
@@ -182,6 +163,7 @@ export class KalendarzComponent implements OnInit {
     this.endOfWeek = this.getEndOfWeek(this.currentWeek);
     this.markAvailableSlots();
     this.markAbsences();
+    this.updateConsultationsCount();
   }
 
   generateWeekDays() {
@@ -234,7 +216,7 @@ export class KalendarzComponent implements OnInit {
     this.currentWeek.setDate(this.currentWeek.getDate() + direction * 7);
     this.currentWeek = this.getStartOfWeek(this.currentWeek);
     this.updateWeek();
-    this.calendarService.loadAppointments();
+    this.calendarService.loadAllData();
     this.markAvailableSlots();
     this.markAbsences();
   }
@@ -242,7 +224,7 @@ export class KalendarzComponent implements OnInit {
   setTimeRange(index: number) {
     this.currentRangeIndex = index;
     this.updateVisibleTimeSlots();
-    this.calendarService.loadAppointments();
+    this.calendarService.loadAllData();
     this.markAvailableSlots();
     this.markAbsences();
   }
@@ -298,7 +280,7 @@ export class KalendarzComponent implements OnInit {
     } else {
       this.updateWeek();
     }
-    this.calendarService.loadAppointments();
+    this.calendarService.loadAllData();
     this.markAvailableSlots();
     this.markAbsences();
   }
@@ -307,7 +289,7 @@ export class KalendarzComponent implements OnInit {
     this.currentDay.setDate(this.currentDay.getDate() + direction);
     this.currentDay = new Date(this.currentDay);
     this.updateDay();
-    this.calendarService.loadAppointments();
+    this.calendarService.loadAllData();
     this.markAvailableSlots();
     this.markAbsences();
   }
@@ -328,21 +310,6 @@ export class KalendarzComponent implements OnInit {
     this.updateConsultationsCount();
   }
 
-  loadUsers() {
-    this.http.get<{ users: User[] }>('assets/data.json').subscribe((data) => {
-      this.users = data.users;
-    });
-  }
-
-  loadAvailabilities() {
-    this.http.get<{ availability: Availability[], absences: Absence[] }>('assets/data.json').subscribe((data) => {
-      this.availabilities = data.availability;
-      this.absences = data.absences;
-      this.generateTimeSlots();
-      this.markAvailableSlots();
-      this.markAbsences();
-    });
-  }
 
   markBookedSlots() {
     const now = new Date();
@@ -378,6 +345,7 @@ export class KalendarzComponent implements OnInit {
     this.availabilities.forEach((availability) => {
       const startDate = new Date(availability.startDate);
       const endDate = new Date(availability.endDate);
+      endDate.setDate(endDate.getDate() + 1); 
 
       this.timeSlots.forEach((slot) => {
         slot.slots.forEach((s, index) => {
@@ -414,30 +382,42 @@ export class KalendarzComponent implements OnInit {
     this.markAbsences();
   }
 
+  private getDaysBetween(start: Date, end: Date): Date[] {
+    const days: Date[] = [];
+    let current = new Date(start);
+  
+    while (current <= end) { 
+      days.push(new Date(current)); 
+      current.setDate(current.getDate() + 1);
+    }
+  
+    return days;
+  }
+
   markAbsences() {
     this.absences.forEach((absence) => {
       const startDate = new Date(absence.startDate);
       const endDate = new Date(absence.endDate);
-
-      this.timeSlots.forEach((slot) => {
-        slot.slots.forEach((s, index) => {
-          const slotDate = this.weekDays[index].date;
-          if (slotDate >= startDate && slotDate <= endDate) {
-            s.absent = true;
-            s.available = false;
-          }
+  
+      const days = this.getDaysBetween(startDate, endDate); 
+  
+      days.forEach(day => {
+        this.timeSlots.forEach((slot) => {
+          slot.slots.forEach((s, index) => {
+            const slotDate = this.weekDays[index].date;
+  
+            if (
+              slotDate.toDateString() === day.toDateString() &&
+              !s.booked &&
+              !s.past
+            ) {
+              s.absent = true;
+            }
+          });
         });
-      });
-
-      this.appointments.forEach((appointment) => {
-        const appointmentDate = new Date(appointment.date);
-        if (appointmentDate >= startDate && appointmentDate <= endDate) {
-          appointment.cancelled = true;
-        }
       });
     });
   }
-
   updateConsultationsCount() {
     this.weekDays.forEach(day => {
       day.consultations = this.appointments.filter(appointment => {
@@ -464,31 +444,44 @@ export class KalendarzComponent implements OnInit {
     this.hoveredAppointment = appointment || null;
   }
 
-  getPatientFirstName(patientId: number): string {
-    const patient = this.users.find(user => user.userId === patientId);
+  removeAppointment(appointmentId: number | string ): void {
+    if (this.user && this.user.uid && appointmentId !== undefined && appointmentId !== null) {
+      this.calendarService.removeAppointment(appointmentId, this.user.uid).subscribe({
+        next: () => {
+          this.reloadPageData();
+        },
+        error: (err) => {
+          this.errorMessage = 'Nie udało się usunąć wizyty.';
+          console.error(err);
+        }
+      });
+    } else {
+      console.error('Invalid appointment ID or user not logged in.');
+    }
+  }
+
+  canDelete(appointment: Appointment): boolean {
+    return this.user ? appointment.patientId === this.user.uid : false;
+  }
+
+  getPatientFirstName(patientId: number | string): string {
+    const patient = this.users.find(user => user.id === patientId || user.uid === patientId);
     return patient ? patient.firstName : '';
   }
 
-  getPatientLastName(patientId: number): string {
-    const patient = this.users.find(user => user.userId === patientId);
+  getPatientLastName(patientId: number | string): string {
+    const patient = this.users.find(user => user.id === patientId || user.uid === patientId);
     return patient ? patient.lastName : '';
   }
 
-  getPatientGender(patientId: number): string {
-    const patient = this.users.find(user => user.userId === patientId);
+  getPatientGender(patientId: number | string): string {
+    const patient = this.users.find(user => user.id === patientId || user.uid === patientId);
     return patient ? patient.gender : '';
   }
 
-  getPatientAge(patientId: number): number | undefined {
-    const patient = this.users.find(user => user.userId === patientId);
+  getPatientAge(patientId: number | string): number | undefined {
+    const patient = this.users.find(user => user.id === patientId || user.uid === patientId);
     return patient ? patient.age : undefined;
   }
 
-  removeAppointment(appointmentId: number | undefined) {
-    if (appointmentId === undefined) return;
-
-    this.calendarService.removeAppointment(appointmentId);
-    this.basketService.removeFromBasketById(appointmentId);
-    this.reloadPageData();
-  }
 }

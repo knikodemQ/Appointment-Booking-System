@@ -1,0 +1,21 @@
+<div class="persistence-selector">
+    <h3>Wybierz tryb persystencji logowania:</h3>
+    <div class="button-group">
+      <button 
+        [class.selected]="currentPersistence === 'LOCAL'" 
+        (click)="setPersistence('LOCAL')">
+        LOCAL (Domyślne)
+      </button>
+      <button 
+        [class.selected]="currentPersistence === 'SESSION'" 
+        (click)="setPersistence('SESSION')">
+        SESSION
+      </button>
+      <button 
+        [class.selected]="currentPersistence === 'NONE'" 
+        (click)="setPersistence('NONE')">
+        NONE
+      </button>
+    </div>
+    <p>{{ message }}</p>
+  </div>

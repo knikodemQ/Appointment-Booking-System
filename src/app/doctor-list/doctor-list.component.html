@@ -1,0 +1,12 @@
+<div class="doctor-list-container">
+    <h2>Lista Lekarzy</h2>
+    <ul>
+      <li *ngFor="let doctor of doctors$ | async">
+        <strong>{{ doctor.firstName }} {{ doctor.lastName }}</strong> <br>
+        Email: {{ doctor.email }} <br>
+        Płeć: {{ doctor.gender }} <br>
+        Wiek: {{ doctor.age || '—' }} <br>
+        Specjalizacja: {{ doctor.specialization || '—' }}
+      </li>
+    </ul>
+  </div>

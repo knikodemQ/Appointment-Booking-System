@@ -1,75 +1,75 @@
 <div class="container">
-    <h2>Definiowanie dostępności</h2>
-    <form [formGroup]="availabilityForm" (ngSubmit)="onSubmit()">
-      <div>
-        <label for="type">Typ dostępności:</label>
-        <select id="type" formControlName="type">
-          <option value="cykliczne">Cykliczne</option>
-          <option value="jednorazowe">Jednorazowe</option>
-        </select>
+  <h2>Definiowanie dostępności</h2>
+  <form [formGroup]="availabilityForm" (ngSubmit)="onSubmit()">
+    <div>
+      <label for="type">Typ dostępności:</label>
+      <select id="type" formControlName="type">
+        <option value="cykliczne">Cykliczne</option>
+        <option value="jednorazowe">Jednorazowe</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="startDate">Data rozpoczęcia:</label>
+      <input type="date" id="startDate" formControlName="startDate" (change)="validateDates()">
+    </div>
+
+    <div *ngIf="availabilityForm.get('type')?.value === 'cykliczne'">
+      <label for="endDate">Data zakończenia:</label>
+      <input
+        type="date"
+        id="endDate"
+        formControlName="endDate"
+        (change)="validateDates()"
+      />
+      <div *ngIf="availabilityForm.get('endDate')?.hasError('invalidDate')">
+        <small class="error">Data zakończenia musi być późniejsza niż data rozpoczęcia.</small>
       </div>
-  
-      <div>
-        <label for="startDate">Data rozpoczęcia:</label>
-        <input type="date" id="startDate" formControlName="startDate" (change)="validateDates()">
-      </div>
-  
-      <div *ngIf="availabilityForm.get('type')?.value === 'cykliczne'">
-        <label for="endDate">Data zakończenia:</label>
+    </div>
+
+    <div *ngIf="availabilityForm.get('type')?.value === 'cykliczne'">
+      <label>Dni konsultacji:</label>
+      <div *ngFor="let day of ['poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota', 'niedziela']">
         <input
-          type="date"
-          id="endDate"
-          formControlName="endDate"
-          (change)="validateDates()"
+          type="checkbox"
+          [value]="day"
+          (change)="onCheckboxChange($event)"
         />
-        <div *ngIf="availabilityForm.get('endDate')?.hasError('invalidDate')">
-          <small class="error">Data zakończenia musi być późniejsza niż data rozpoczęcia.</small>
+        {{ day }}
+      </div>
+    </div>
+
+    <div formArrayName="timeSlots">
+      <div *ngFor="let timeSlot of timeSlotControls.controls; let i = index" [formGroupName]="i">
+        <label for="from">Od:</label>
+        <select formControlName="from" (change)="validateTimeSlots(i)">
+          <option *ngFor="let time of timeSlots" [value]="time">{{ time }}</option>
+        </select>
+
+        <label for="to">Do:</label>
+        <select formControlName="to" (change)="validateTimeSlots(i)">
+          <option *ngFor="let time of timeSlots" [value]="time">{{ time }}</option>
+        </select>
+
+        <div *ngIf="timeSlot.get('to')?.hasError('invalidTime')">
+          <small class="error">Godzina zakończenia musi być późniejsza niż godzina rozpoczęcia.</small>
         </div>
-      </div>
-  
-      <div *ngIf="availabilityForm.get('type')?.value === 'cykliczne'">
-        <label>Dni konsultacji:</label>
-        <div *ngFor="let day of ['poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota', 'niedziela']">
-          <input
-            type="checkbox"
-            [value]="day"
-            (change)="onCheckboxChange($event)"
-          />
-          {{ day }}
+
+        <div *ngIf="timeSlot.get('from')?.hasError('overlap')">
+          <small class="error">Przedziały czasowe nie mogą się pokrywać.</small>
         </div>
+
+        <button type="button" (click)="removeTimeSlot(i)">Usuń</button>
       </div>
-  
-      <div formArrayName="timeSlots">
-        <div *ngFor="let timeSlot of timeSlotControls.controls; let i = index" [formGroupName]="i">
-          <label for="from">Od:</label>
-          <select formControlName="from" (change)="validateTimeSlots(i)">
-            <option *ngFor="let time of timeSlots" [value]="time">{{ time }}</option>
-          </select>
-  
-          <label for="to">Do:</label>
-          <select formControlName="to" (change)="validateTimeSlots(i)">
-            <option *ngFor="let time of timeSlots" [value]="time">{{ time }}</option>
-          </select>
-  
-          <div *ngIf="timeSlot.get('to')?.hasError('invalidTime')">
-            <small class="error">Godzina zakończenia musi być późniejsza niż godzina rozpoczęcia.</small>
-          </div>
-  
-          <div *ngIf="timeSlot.get('from')?.hasError('overlap')">
-            <small class="error">Przedziały czasowe nie mogą się pokrywać.</small>
-          </div>
-  
-          <button type="button" (click)="removeTimeSlot(i)">Usuń</button>
-        </div>
-      </div>
-      <button type="button" (click)="addTimeSlot()">Dodaj przedział czasowy</button>
-  
-      <div *ngIf="availabilityForm.hasError('invalidDay')">
-        <small class="error">Wybrany dzień jest nieprawidłowy, ponieważ pokrywa się z nieobecnością.</small>
-      </div>
-  
-      <div class="submit">
-        <button type="submit" [disabled]="!availabilityForm.valid">Zapisz dostępność</button>
-      </div>
-    </form>
-  </div>
+    </div>
+    <button type="button" (click)="addTimeSlot()">Dodaj przedział czasowy</button>
+
+    <div *ngIf="availabilityForm.hasError('invalidDay')">
+      <small class="error">Wybrany dzień jest nieprawidłowy, ponieważ pokrywa się z nieobecnością.</small>
+    </div>
+
+    <div class="submit">
+      <button type="submit" [disabled]="!availabilityForm.valid">Zapisz dostępność</button>
+    </div>
+  </form>
+</div>

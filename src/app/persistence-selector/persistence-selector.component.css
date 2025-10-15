@@ -1,0 +1,41 @@
+.persistence-selector {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 20px 0;
+  }
+  
+  .persistence-selector h3 {
+    margin-bottom: 10px;
+  }
+  
+  .button-group {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .persistence-selector button {
+    padding: 10px 20px;
+    cursor: pointer;
+    border: 1px solid #007bff;
+    background-color: #fff;
+    color: #007bff;
+    border-radius: 4px;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .persistence-selector button:hover {
+    background-color: #e7f3ff;
+  }
+  
+  .persistence-selector button.selected {
+    background-color: #007bff;
+    color: #fff;
+  }
+  
+  .persistence-selector p {
+    margin-top: 10px;
+    color: green;
+  }

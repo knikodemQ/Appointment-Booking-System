@@ -56,7 +56,9 @@
             (mouseleave)="onHover(undefined)">
           <div class="slot-content">
             {{ slot.consultationType || '' }}
-            <button *ngIf="slot.booked" class="remove-button" (click)="removeAppointment(slot.appointment?.appointmentId)">X</button>
+            <button *ngIf="slot.booked && slot.appointment && canDelete(slot.appointment!)"
+            class="remove-button"
+            (click)="removeAppointment(slot.appointment!.uid!)">X</button>
           </div>
         </td>
       </tr>
