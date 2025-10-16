@@ -10,21 +10,6 @@ A comprehensive web application for managing medical appointments with multi-dat
 [![Node.js](https://img.shields.io/badge/Node.js-18+-brightgreen?style=for-the-badge&logo=node.js)](https://nodejs.org/)
 [![Express](https://img.shields.io/badge/Express-5.x-lightgrey?style=for-the-badge&logo=express)](https://expressjs.com/)
 
-## Table of Contents
-
-- [Overview](#-overview)
-- [Features](#-features)
-- [Technology Stack](#-technology-stack)
-- [Project Structure](#-project-structure)
-- [Installation & Setup](#-installation--setup)
-- [Database Support](#-database-support)
-- [API Endpoints](#-api-endpoints)
-- [Database Schema](#-database-schema)
-- [Screenshots](#-screenshots)
-- [Authentication](#-authentication)
-- [Development Guide](#-development-guide)
-- [License](#-license)
-
 ## Overview
 
 The Medical Appointment Booking System is a modern, full-stack web application designed to streamline the process of scheduling and managing medical appointments. The system supports multiple data sources and provides comprehensive functionality for both healthcare providers and patients.
