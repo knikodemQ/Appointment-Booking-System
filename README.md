@@ -421,21 +421,33 @@ interface Absence {
 ## Screenshots of application
 
 ###  Home Page
-
-![Home Page](./images_docs/HomeP.jpg)
-
-###  Doctor List
+![Home Page](https://github.com/knikodemQ/Appointment-Booking-System/blob/master/images_docs/HopeP.jpg)
 
 ### Calendar View
-
-### Appointment Basket
+![Calendar View 1](https://github.com/knikodemQ/Appointment-Booking-System/blob/master/images_docs/Calendar1.jpg)
+![Calendar View 2](https://github.com/knikodemQ/Appointment-Booking-System/blob/master/images_docs/Calendar2.jpg)
+![Calendar View 3](https://github.com/knikodemQ/Appointment-Booking-System/blob/master/images_docs/Calendar3.jpg)
 
 ### Admin Dashboard
+![Admin Dashboard 1](https://github.com/knikodemQ/Appointment-Booking-System/blob/master/images_docs/Admin1.jpg)
+![Admin Dashboard 2](https://github.com/knikodemQ/Appointment-Booking-System/blob/master/images_docs/Admin2.jpg)
+![Admin Dashboard 3](https://github.com/knikodemQ/Appointment-Booking-System/blob/master/images_docs/Admin3.jpg)
 
 ### Forms
+![Form 1](https://github.com/knikodemQ/Appointment-Booking-System/blob/master/images_docs/Form1.jpg)
+![Form 2](https://github.com/knikodemQ/Appointment-Booking-System/blob/master/images_docs/Form2.jpg)
+![Form 3](https://github.com/knikodemQ/Appointment-Booking-System/blob/master/images_docs/Form3.png)
+
+###  Doctor List
+![Doctor List](https://github.com/knikodemQ/Appointment-Booking-System/blob/master/images_docs/DoctorList.jpg)
+
+### Appointment Basket
+![Appointment Basket](https://github.com/knikodemQ/Appointment-Booking-System/blob/master/images_docs/Basket.jpg)
 
 ### Mobile Responsive
-
+![Mobile Responsive 1](https://github.com/knikodemQ/Appointment-Booking-System/blob/master/images_docs/Mobile1.jpg)
+![Mobile Responsive 2](https://github.com/knikodemQ/Appointment-Booking-System/blob/master/images_docs/Mobile2.jpg)
+![Mobile Responsive 3](https://github.com/knikodemQ/Appointment-Booking-System/blob/master/images_docs/Mobile3.jpg)
 
 ## Authentication
 
